@@ -19,7 +19,8 @@ using namespace kaldi;
 namespace alex_asr {
     class DecoderConfig {
     public:
-        enum ModelType { None, GMM, NNET2 };
+        enum ModelType { NoneModelType, GMM, NNET2 };
+        enum FeatureType { NoneFeatureType, MFCC, FBANK };
 
         DecoderConfig();
         ~DecoderConfig();
@@ -30,6 +31,7 @@ namespace alex_asr {
         LatticeFasterDecoderConfig decoder_opts;
         nnet2::DecodableNnet2OnlineOptions decodable_opts;
         MfccOptions mfcc_opts;
+        FbankOptions fbank_opts;
         OnlineCmvnOptions cmvn_opts;
         OnlineSpliceOptions splice_opts;
         OnlineEndpointConfig endpoint_config;
@@ -42,6 +44,7 @@ namespace alex_asr {
         OnlineIvectorExtractionInfo *ivector_extraction_info;
 
         ModelType model_type;
+        FeatureType feature_type;
         int32 bits_per_sample;
 
         bool use_lda;
@@ -53,6 +56,7 @@ namespace alex_asr {
         std::string cfg_decoder;
         std::string cfg_decodable;
         std::string cfg_mfcc;
+        std::string cfg_fbank;
         std::string cfg_cmvn;
         std::string cfg_splice;
         std::string cfg_endpoint;
@@ -74,6 +78,7 @@ namespace alex_asr {
         bool OptionCheck(bool cond, std::string fail_text);
 
         string model_type_str;
+        string feature_type_str;
     };
 }
 
