@@ -205,4 +205,26 @@ namespace alex_asr {
         }
         return true;
     }
+
+    BaseFloat DecoderConfig::FrameShiftInSeconds() const {
+        if(feature_type == DecoderConfig::MFCC) {
+            return mfcc_opts.frame_opts.frame_shift_ms * 1.0e-03;
+        } else if(feature_type == DecoderConfig::FBANK) {
+            return fbank_opts.frame_opts.frame_shift_ms * 1.0e-03;
+        } else {
+            KALDI_ERR << "You have to specify a valid feature_type.";
+            return 0.0;
+        }
+    }
+
+    BaseFloat DecoderConfig::SamplingFrequency() const {
+        if(feature_type == DecoderConfig::MFCC) {
+            return mfcc_opts.frame_opts.samp_freq;
+        } else if(feature_type == DecoderConfig::FBANK) {
+            return fbank_opts.frame_opts.samp_freq;
+        } else {
+            KALDI_ERR << "You have to specify a valid feature_type.";
+            return 0.0;
+        }
+    }
 }

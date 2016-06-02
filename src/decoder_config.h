@@ -27,6 +27,8 @@ namespace alex_asr {
         void Register(ParseOptions *po);
         void LoadConfigs(const string cfg_file);
         bool InitAndCheck();
+        BaseFloat FrameShiftInSeconds() const;
+        BaseFloat SamplingFrequency() const;
 
         LatticeFasterDecoderConfig decoder_opts;
         nnet2::DecodableNnet2OnlineOptions decodable_opts;

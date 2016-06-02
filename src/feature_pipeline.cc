@@ -33,6 +33,8 @@ namespace alex_asr {
                           << " " << config.fbank_opts.mel_opts.high_freq;
             prev_feature = base_feature_ = new OnlineFbank(config.fbank_opts);
             KALDI_VLOG(3) << "    -> dims: " << base_feature_->Dim();
+        } else {
+            KALDI_ERR << "You have to specify a valid feature_type.";
         }
 
         if (config.use_cmvn) {
