@@ -38,6 +38,7 @@ namespace alex_asr {
         po->Register("model", &model_rxfilename, "Accoustic model filename.");
         po->Register("hclg", &fst_rxfilename, "HCLG FST filename.");
         po->Register("words", &words_rxfilename, "Word to ID mapping filename.");
+        po->Register("word_boundary", &word_boundary_rxfilename, "data/lang/phones/word_boundary.int");
         po->Register("mat_lda", &lda_mat_rspecifier, "LDA matrix filename.");
         po->Register("mat_cmvn", &fcmvn_mat_rspecifier, "CMVN matrix filename.");
         po->Register("use_lda", &use_lda, "Are we using LDA transform?");

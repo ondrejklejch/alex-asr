@@ -68,6 +68,7 @@ namespace alex_asr {
         std::string model_rxfilename;
         std::string fst_rxfilename;
         std::string words_rxfilename;
+        std::string word_boundary_rxfilename;
         std::string lda_mat_rspecifier;
         std::string fcmvn_mat_rspecifier;
     private:

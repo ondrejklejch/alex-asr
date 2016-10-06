@@ -13,6 +13,7 @@
 #include "util/common-utils.h"
 #include "lat/kaldi-lattice.h"
 #include "lat/lattice-functions.h"
+#include "lat/word-align-lattice.h"
 #include "nnet2/online-nnet2-decodable.h"
 #include "online2/online-gmm-decodable.h"
 #include "online2/online-endpoint.h"
@@ -43,6 +44,7 @@ namespace alex_asr {
         void GetIvector(std::vector<float> *ivector);
         void SetBitsPerSample(int n_bits);
         int GetBitsPerSample();
+        float GetFrameShift();
     private:
         FeaturePipeline *feature_pipeline_;
 
@@ -52,6 +54,7 @@ namespace alex_asr {
         nnet2::AmNnet *am_nnet2_;
         AmDiagGmm *am_gmm_;
         fst::SymbolTable *words_;
+        WordBoundaryInfo *word_boundary_info_;
         DecoderConfig *config_;
         DecodableInterface *decodable_;
 

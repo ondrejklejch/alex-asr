@@ -96,6 +96,12 @@ namespace alex_asr {
 
         KALDI_PARANOID_ASSERT(words_ == NULL);
         words_ = fst::SymbolTable::ReadText(config_->words_rxfilename);
+
+        KALDI_PARANOID_ASSERT(word_boundary_info == NULL);
+        if(config_->word_boundary_rxfilename != "") {
+            WordBoundaryInfoNewOpts word_boundary_info_opts;
+            word_boundary_info_ = new WordBoundaryInfo(word_boundary_info_opts, config_->word_boundary_rxfilename);
+        }
     }
 
     void Decoder::Reset() {
@@ -222,15 +228,21 @@ namespace alex_asr {
     bool Decoder::GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths) {
         Lattice lat;
         CompactLattice compact_lat;
-        CompactLattice compact_best_path;
+        CompactLattice best_path;
+        CompactLattice aligned_best_path;
         bool ok = true;
 
         ok = ok && decoder_->GetRawLattice(&lat);
         BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
         DeterminizeLatticePhonePrunedWrapper(*trans_model_, &lat, lat_beam, &compact_lat, config_->decoder_opts.det_opts);
+        CompactLatticeShortestPath(compact_lat, &best_path);
 
-        CompactLatticeShortestPath(compact_lat, &compact_best_path);
-        ok = ok && CompactLatticeToWordAlignment(compact_best_path, words, times, lengths);
+        if(config_->word_boundary_rxfilename == "") {
+            ok = ok && CompactLatticeToWordAlignment(best_path, words, times, lengths);
+        } else {
+            ok = ok && WordAlignLattice(best_path, *trans_model_, *word_boundary_info_, 0, &aligned_best_path);
+            ok = ok && CompactLatticeToWordAlignment(aligned_best_path, words, times, lengths);
+        }
 
         return ok;
     }
@@ -284,5 +296,9 @@ namespace alex_asr {
 
     int Decoder::GetBitsPerSample() {
         return config_->bits_per_sample;
+    }
+
+    float Decoder::GetFrameShift() {
+        return config_->FrameShiftInSeconds();
     }
 }

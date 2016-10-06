@@ -34,6 +34,7 @@ cdef extern from "src/decoder.h" namespace "alex_asr":
         void GetIvector(vector[float] *ivector) except +
         int GetBitsPerSample() except +
         void SetBitsPerSample(int n_bits) except +
+        float GetFrameShift() except +
 
 
 # NOTE: Function signatures as the first line of the docstring are needed in order for
@@ -138,10 +139,11 @@ cdef class Decoder:
         cdef vector[int] w
         cdef vector[int] t
         cdef vector[int] d
+        cdef float frame_shift = self.thisptr.GetFrameShift()
         self.thisptr.GetTimeAlignment(address(w), address(t), address(d))
         words = [w[i] for i in xrange(w.size()) if w[i] != 0]
-        times = [t[i] for i in xrange(t.size()) if w[i] != 0]
-        durations = [d[i] for i in xrange(d.size()) if w[i] != 0]
+        times = [t[i] * frame_shift for i in xrange(t.size()) if w[i] != 0]
+        durations = [d[i] * frame_shift for i in xrange(d.size()) if w[i] != 0]
 
         return (words, times, durations)
 
