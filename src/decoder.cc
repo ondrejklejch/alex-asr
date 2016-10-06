@@ -2,6 +2,7 @@
 #include "src/utils.h"
 
 #include "online2/onlinebin-util.h"
+#include "lat/kaldi-lattice.h"
 
 using namespace kaldi;
 
@@ -214,6 +215,22 @@ namespace alex_asr {
                 *trans_model_, &raw_lat, lat_beam, &lat, config_->decoder_opts.det_opts);
 
         *tot_lik = CompactLatticeToWordsPost(lat, fst_out);
+
+        return ok;
+    }
+
+    bool Decoder::GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths) {
+        Lattice lat;
+        CompactLattice compact_lat;
+        CompactLattice compact_best_path;
+        bool ok = true;
+
+        ok = ok && decoder_->GetRawLattice(&lat);
+        BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
+        DeterminizeLatticePhonePrunedWrapper(*trans_model_, &lat, lat_beam, &compact_lat, config_->decoder_opts.det_opts);
+
+        CompactLatticeShortestPath(compact_lat, &compact_best_path);
+        ok = ok && CompactLatticeToWordAlignment(compact_best_path, words, times, lengths);
 
         return ok;
     }

@@ -22,6 +22,7 @@ cdef extern from "src/decoder.h" namespace "alex_asr":
         void FrameIn(unsigned char *frame, size_t frame_len) except +
         bool GetBestPath(vector[int] *v_out, float *lik) except +
         bool GetLattice(alex_asr.fst.libfst.LogVectorFst *fst_out, double *tot_lik) except +
+        bool GetTimeAlignment(vector[int] *words, vector[int] *times, vector[int] *durations) except +
         string GetWord(int word_id) except +
         void InputFinished() except +
         bool EndpointDetected() except +
@@ -125,6 +126,24 @@ cdef class Decoder:
             self.thisptr.GetLattice((<alex_asr.fst._fst.LogVectorFst?>r).fst, address(lik))
         self.utt_decoded = 0
         return (lik, r)
+
+    def get_time_alignment(self):
+        """get_best_path(self)
+        Get time alignment of the current 1-best decoding hypothesis.
+
+        Returns:
+            tuple: (list of word id's, list of start times, list of durations)
+        """
+
+        cdef vector[int] w
+        cdef vector[int] t
+        cdef vector[int] d
+        self.thisptr.GetTimeAlignment(address(w), address(t), address(d))
+        words = [w[i] for i in xrange(w.size()) if w[i] != 0]
+        times = [t[i] for i in xrange(t.size()) if w[i] != 0]
+        durations = [d[i] for i in xrange(d.size()) if w[i] != 0]
+
+        return (words, times, durations)
 
     def get_word(self, word_id):
         """get_word(self, word_id)

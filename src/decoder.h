@@ -11,6 +11,8 @@
 #include "feat/online-feature.h"
 #include "matrix/matrix-lib.h"
 #include "util/common-utils.h"
+#include "lat/kaldi-lattice.h"
+#include "lat/lattice-functions.h"
 #include "nnet2/online-nnet2-decodable.h"
 #include "online2/online-gmm-decodable.h"
 #include "online2/online-endpoint.h"
@@ -29,6 +31,7 @@ namespace alex_asr {
         void FrameIn(VectorBase<BaseFloat> *waveform_in);
         bool GetBestPath(std::vector<int> *v_out, BaseFloat *prob);
         bool GetLattice(fst::VectorFst<fst::LogArc> * out_fst, double *tot_lik, bool end_of_utt=true);
+        bool GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths);
         string GetWord(int word_id);
         void InputFinished();
         bool EndpointDetected();

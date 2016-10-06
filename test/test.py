@@ -45,5 +45,11 @@ if __name__ == "__main__":
         for arc in state.arcs:
             print ('    %s' % decoder.get_word(arc.ilabel))
 
+    print ('Resulting time alignment:')
+    words, times, durations = decoder.get_time_alignment()
+    words = word_ids_to_str_hyp(decoder, words).split()
 
+    for (word, time, duration) in zip(words, times, durations):
+        if word != "<eps>":
+            print (word, time, duration)
 
