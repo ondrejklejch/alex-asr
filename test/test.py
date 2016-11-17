@@ -53,3 +53,12 @@ if __name__ == "__main__":
         if word != "<eps>":
             print (word, time, duration)
 
+    print ('Resulting time alignment with word confidence:')
+    words, times, durations, confidences = decoder.get_time_alignment_with_word_confidence()
+    words = word_ids_to_str_hyp(decoder, words).split()
+
+    for (word, time, duration, conf) in zip(words, times, durations, confidences):
+        if word != "<eps>":
+            print (word, time, duration, conf)
+
+

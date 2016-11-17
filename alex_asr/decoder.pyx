@@ -23,6 +23,7 @@ cdef extern from "src/decoder.h" namespace "alex_asr":
         bool GetBestPath(vector[int] *v_out, float *lik) except +
         bool GetLattice(alex_asr.fst.libfst.LogVectorFst *fst_out, double *tot_lik) except +
         bool GetTimeAlignment(vector[int] *words, vector[int] *times, vector[int] *durations) except +
+        bool GetTimeAlignmentWithWordConfidence(vector[int] *words, vector[int] *times, vector[int] *durations, vector[float] *confs) except +
         string GetWord(int word_id) except +
         void InputFinished() except +
         bool EndpointDetected() except +
@@ -146,6 +147,27 @@ cdef class Decoder:
         durations = [d[i] * frame_shift for i in xrange(d.size()) if w[i] != 0]
 
         return (words, times, durations)
+
+    def get_time_alignment_with_word_confidence(self):
+        """get_best_path(self)
+        Get time alignment of the current 1-best decoding hypothesis.
+
+        Returns:
+            tuple: (list of word id's, list of start times, list of durations)
+        """
+
+        cdef vector[int] w
+        cdef vector[int] t
+        cdef vector[int] d
+        cdef vector[float] c
+        cdef float frame_shift = self.thisptr.GetFrameShift()
+        self.thisptr.GetTimeAlignmentWithWordConfidence(address(w), address(t), address(d), address(c))
+        words = [w[i] for i in xrange(w.size()) if w[i] != 0]
+        times = [t[i] * frame_shift for i in xrange(t.size()) if w[i] != 0]
+        durations = [d[i] * frame_shift for i in xrange(d.size()) if w[i] != 0]
+
+        return (words, times, durations, c)
+
 
     def get_word(self, word_id):
         """get_word(self, word_id)

@@ -3,6 +3,7 @@
 
 #include "online2/onlinebin-util.h"
 #include "lat/kaldi-lattice.h"
+#include "lat/sausages.h"
 
 using namespace kaldi;
 
@@ -243,6 +244,31 @@ namespace alex_asr {
             ok = ok && WordAlignLattice(best_path, *trans_model_, *word_boundary_info_, 0, &aligned_best_path);
             ok = ok && CompactLatticeToWordAlignment(aligned_best_path, words, times, lengths);
         }
+
+        return ok;
+    }
+
+    bool Decoder::GetTimeAlignmentWithWordConfidence(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths, std::vector<float> *confs) {
+        Lattice lat;
+        CompactLattice compact_lat;
+        CompactLattice best_path;
+        CompactLattice aligned_best_path;
+        bool ok = true;
+
+        ok = ok && decoder_->GetRawLattice(&lat);
+        BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
+        DeterminizeLatticePhonePrunedWrapper(*trans_model_, &lat, lat_beam, &compact_lat, config_->decoder_opts.det_opts);
+        CompactLatticeShortestPath(compact_lat, &best_path);
+
+        if(config_->word_boundary_rxfilename != "") {
+            ok = ok && WordAlignLattice(best_path, *trans_model_, *word_boundary_info_, 0, &aligned_best_path);
+        } else {
+            aligned_best_path = best_path;
+        }
+
+        ok = ok && CompactLatticeToWordAlignment(aligned_best_path, words, times, lengths);
+        MinimumBayesRisk *mbr = new MinimumBayesRisk(compact_lat, *words, true);
+        *confs = mbr->GetOneBestConfidences();
 
         return ok;
     }

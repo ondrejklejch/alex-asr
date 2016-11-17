@@ -33,6 +33,7 @@ namespace alex_asr {
         bool GetBestPath(std::vector<int> *v_out, BaseFloat *prob);
         bool GetLattice(fst::VectorFst<fst::LogArc> * out_fst, double *tot_lik, bool end_of_utt=true);
         bool GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths);
+        bool GetTimeAlignmentWithWordConfidence(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths, std::vector<float> *confs);
         string GetWord(int word_id);
         void InputFinished();
         bool EndpointDetected();
