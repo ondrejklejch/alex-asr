@@ -35,6 +35,7 @@ ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
           $(KALDI_DIR)/src/online2/kaldi-online2.a \
           $(KALDI_DIR)/src/ivector/kaldi-ivector.a \
           $(KALDI_DIR)/src/nnet2/kaldi-nnet2.a \
+          $(KALDI_DIR)/src/nnet3/kaldi-nnet3.a \
           $(KALDI_DIR)/src/lat/kaldi-lat.a \
           $(KALDI_DIR)/src/decoder/kaldi-decoder.a  \
           $(KALDI_DIR)/src/cudamatrix/kaldi-cudamatrix.a \

@@ -14,6 +14,7 @@ namespace alex_asr {
             decoder_(NULL),
             trans_model_(NULL),
             am_nnet2_(NULL),
+            am_nnet3_(NULL),
             am_gmm_(NULL),
             words_(NULL),
             config_(NULL),
@@ -37,6 +38,7 @@ namespace alex_asr {
         delete decoder_;
         delete trans_model_;
         delete am_nnet2_;
+        delete am_nnet3_;
         delete am_gmm_;
         delete words_;
         delete config_;
@@ -88,6 +90,10 @@ namespace alex_asr {
             KALDI_PARANOID_ASSERT(am_nnet2_ == NULL);
             am_nnet2_ = new nnet2::AmNnet();
             am_nnet2_->Read(ki.Stream(), binary);
+        } else if(config_->model_type == DecoderConfig::NNET3) {
+            KALDI_PARANOID_ASSERT(am_nnet3_ == NULL);
+            am_nnet3_ = new nnet3::AmNnetSimple();
+            am_nnet3_->Read(ki.Stream(), binary);
         }
 
         KALDI_PARANOID_ASSERT(hclg_ == NULL);
@@ -121,11 +127,14 @@ namespace alex_asr {
                                                          *trans_model_,
                                                          config_->decodable_opts,
                                                          feature_pipeline_->GetFeature());
+        } else if(config_->model_type == DecoderConfig::NNET3) {
+            decodable_ = new kaldi::nnet3::DecodableNnet3SimpleOnline(*am_nnet3_,
+                                                                      *trans_model_,
+                                                                      config_->nnet3_decodable_opts,
+                                                                      feature_pipeline_->GetFeature());
         } else {
             KALDI_ASSERT(false);  // This means the program is in invalid state.
         }
-
-
 
         decoder_->InitDecoding();
     }

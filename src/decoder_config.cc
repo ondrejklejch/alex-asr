@@ -22,6 +22,7 @@ namespace alex_asr {
             cfg_pitch("")
     {
         decodable_opts.acoustic_scale = 0.1;
+        nnet3_decodable_opts.acoustic_scale = 0.1;
         splice_opts.left_context = 3;
         splice_opts.right_context = 3;
     }
@@ -33,7 +34,7 @@ namespace alex_asr {
     }
 
     void DecoderConfig::Register(ParseOptions *po) {
-        po->Register("model_type", &model_type_str, "Type of model. GMM/NNET2");
+        po->Register("model_type", &model_type_str, "Type of model. GMM/NNET2/NNET3");
         po->Register("feature_type", &feature_type_str, "Type of features. MFCC/FBANK");
         po->Register("model", &model_rxfilename, "Accoustic model filename.");
         po->Register("hclg", &fst_rxfilename, "HCLG FST filename.");
@@ -67,8 +68,13 @@ namespace alex_asr {
         KALDI_VLOG(2) << "Reading master config file: " << cfg_file;
         po.ReadConfigFile(cfg_file);
 
+        if(model_type_str == "nnet3") {
+            LoadConfig(cfg_decodable, &nnet3_decodable_opts);
+        } else {
+            LoadConfig(cfg_decodable, &decodable_opts);
+        }
+
         LoadConfig(cfg_decoder, &decoder_opts);
-        LoadConfig(cfg_decodable, &decodable_opts);
         LoadConfig(cfg_mfcc, &mfcc_opts);
         LoadConfig(cfg_fbank, &fbank_opts);
         LoadConfig(cfg_cmvn, &cmvn_opts);
@@ -161,6 +167,8 @@ namespace alex_asr {
             model_type = GMM;
         } else if(model_type_str == "nnet2") {
             model_type = NNET2;
+        } else if(model_type_str == "nnet3") {
+            model_type = NNET3;
         } else {
             res = false;
 
@@ -208,10 +216,15 @@ namespace alex_asr {
     }
 
     BaseFloat DecoderConfig::FrameShiftInSeconds() const {
+        int frame_subsampling_factor = 1;
+        if(model_type == DecoderConfig::NNET3) {
+            frame_subsampling_factor = nnet3_decodable_opts.frame_subsampling_factor;
+        }
+
         if(feature_type == DecoderConfig::MFCC) {
-            return mfcc_opts.frame_opts.frame_shift_ms * 1.0e-03;
+            return mfcc_opts.frame_opts.frame_shift_ms * frame_subsampling_factor * 1.0e-03;
         } else if(feature_type == DecoderConfig::FBANK) {
-            return fbank_opts.frame_opts.frame_shift_ms * 1.0e-03;
+            return fbank_opts.frame_opts.frame_shift_ms * frame_subsampling_factor * 1.0e-03;
         } else {
             KALDI_ERR << "You have to specify a valid feature_type.";
             return 0.0;

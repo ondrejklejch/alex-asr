@@ -1,6 +1,6 @@
 # Alex-ASR
 
-Incremental speech recognition decoder for Kaldi NNET2 and GMM models with Python bindings (tested with Python 2.7 and Python 3.4).
+Incremental speech recognition decoder for Kaldi NNET2, NNET3 and GMM models with Python bindings (tested with Python 2.7 and Python 3.4).
 
 Python module documentation is [here](http://ufal-dsg.github.io/alex-asr/).
 
@@ -52,7 +52,7 @@ $ python setup.py install
 Example of `alex_asr.conf` that should reside in `model_dir`:
 
 ```
---model_type=nnet2     # Supported model types are nnet2 (nnet2::AmNnet) and gmm (AmDiagGmm)
+--model_type=nnet2     # Supported model types are nnet2 (nnet2::AmNnet), nnet3 (nnet3:AmNnetSimple) and gmm (AmDiagGmm)
 --feature_type=mfcc    # Supported feature types are mfcc and fbank
 --model=final.mdl      # Filename of the mdl file for the decoder.
 --hclg=HCLG.fst        # Filename of the fst file with decoding HCLG fst.

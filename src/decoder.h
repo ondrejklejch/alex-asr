@@ -16,6 +16,7 @@
 #include "lat/word-align-lattice.h"
 #include "nnet2/online-nnet2-decodable.h"
 #include "online2/online-gmm-decodable.h"
+#include "online2/online-nnet3-decoding.h"
 #include "online2/online-endpoint.h"
 
 
@@ -53,6 +54,7 @@ namespace alex_asr {
         LatticeFasterOnlineDecoder *decoder_;
         TransitionModel *trans_model_;
         nnet2::AmNnet *am_nnet2_;
+        nnet3::AmNnetSimple *am_nnet3_;
         AmDiagGmm *am_gmm_;
         fst::SymbolTable *words_;
         WordBoundaryInfo *word_boundary_info_;

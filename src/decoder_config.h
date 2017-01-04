@@ -9,6 +9,7 @@
 #include "feat/online-feature.h"
 #include "feat/pitch-functions.h"
 #include "nnet2/online-nnet2-decodable.h"
+#include "nnet3/online-nnet3-decodable-simple.h"
 #include "online2/online-endpoint.h"
 #include "online2/online-ivector-feature.h"
 #include "util/stl-utils.h"
@@ -19,7 +20,7 @@ using namespace kaldi;
 namespace alex_asr {
     class DecoderConfig {
     public:
-        enum ModelType { NoneModelType, GMM, NNET2 };
+        enum ModelType { NoneModelType, GMM, NNET2, NNET3 };
         enum FeatureType { NoneFeatureType, MFCC, FBANK };
 
         DecoderConfig();
@@ -32,6 +33,7 @@ namespace alex_asr {
 
         LatticeFasterDecoderConfig decoder_opts;
         nnet2::DecodableNnet2OnlineOptions decodable_opts;
+        nnet3::DecodableNnet3OnlineOptions nnet3_decodable_opts;
         MfccOptions mfcc_opts;
         FbankOptions fbank_opts;
         OnlineCmvnOptions cmvn_opts;

@@ -37,22 +37,24 @@ namespace alex_asr {
             KALDI_ERR << "You have to specify a valid feature_type.";
         }
 
-        if (config.use_cmvn) {
+        if(config.use_cmvn) {
             KALDI_VLOG(3) << "Feature CMVN";
             cmvn_state_ = new OnlineCmvnState(*config.cmvn_mat);
             prev_feature = cmvn_ = new OnlineCmvn(config.cmvn_opts, *cmvn_state_, prev_feature);
         }
 
-        if (config.use_pitch) {
+        if(config.use_pitch) {
             pitch_ = new OnlinePitchFeature(config.pitch_opts);
             pitch_feature_ = new OnlineProcessPitch(config.pitch_process_opts, pitch_);
             prev_feature = pitch_append_ = new OnlineAppendFeature(prev_feature, pitch_feature_);
         }
 
-        KALDI_VLOG(3) << "Feature SPLICE " << config.splice_opts.left_context << " " <<
-                      config.splice_opts.right_context;
-        prev_feature = splice_ = new OnlineSpliceFrames(config.splice_opts, prev_feature);
-        KALDI_VLOG(3) << "    -> dims: " << splice_->Dim();
+        if(config.model_type != DecoderConfig::NNET3) {
+            KALDI_VLOG(3) << "Feature SPLICE " << config.splice_opts.left_context << " " <<
+                          config.splice_opts.right_context;
+            prev_feature = splice_ = new OnlineSpliceFrames(config.splice_opts, prev_feature);
+            KALDI_VLOG(3) << "    -> dims: " << splice_->Dim();
+        }
 
         if(config.use_lda) {
             KALDI_VLOG(3) << "Feature LDA " << config.lda_mat->NumRows() << " " << config.lda_mat->NumCols();
