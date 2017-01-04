@@ -73,4 +73,13 @@ clean:
 test:
 	(PYTHONPATH=$(shell echo build/lib.*) python test/test.py )
 
+docker_build:
+	docker build -t choko/alex-asr .
 
+docker_test:
+	docker run -i -t --rm \
+        -v `pwd`/test:/opt/app/alex-asr/test \
+        -v `pwd`/Makefile:/opt/app/alex-asr/Makefile \
+        -v `pwd`/src:/opt/app/alex-asr/src \
+        choko/alex-asr \
+        bash -c "make -j 4 && python setup.py install && cd test && python test.py"
