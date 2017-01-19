@@ -10,6 +10,7 @@ namespace alex_asr {
         cmvn_(NULL),
         cmvn_state_(NULL),
         splice_(NULL),
+        delta_(NULL),
         transform_lda_(NULL),
         ivector_(NULL),
         ivector_append_(NULL),
@@ -50,10 +51,17 @@ namespace alex_asr {
         }
 
         if(config.model_type != DecoderConfig::NNET3) {
+            // TODO
             KALDI_VLOG(3) << "Feature SPLICE " << config.splice_opts.left_context << " " <<
                           config.splice_opts.right_context;
             prev_feature = splice_ = new OnlineSpliceFrames(config.splice_opts, prev_feature);
             KALDI_VLOG(3) << "    -> dims: " << splice_->Dim();
+        }
+
+        if(config.cfg_delta != "") {
+            KALDI_VLOG(3) << "Feature DELTA";
+            prev_feature = delta_ = new OnlineDeltaFeature(config.delta_opts, prev_feature);
+            KALDI_VLOG(3) << "    -> dims: " << delta_->Dim();
         }
 
         if(config.use_lda) {
@@ -77,6 +85,7 @@ namespace alex_asr {
         delete cmvn_;
         delete cmvn_state_;
         delete splice_;
+        delete delta_;
         delete transform_lda_;
         delete ivector_;
         delete ivector_append_;

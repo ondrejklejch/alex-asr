@@ -17,6 +17,7 @@ namespace alex_asr {
             cfg_fbank(""),
             cfg_cmvn(""),
             cfg_splice(""),
+            cfg_delta(""),
             cfg_endpoint(""),
             cfg_ivector(""),
             cfg_pitch("")
@@ -54,6 +55,7 @@ namespace alex_asr {
         po->Register("cfg_fbank", &cfg_fbank, "");
         po->Register("cfg_cmvn", &cfg_cmvn, "");
         po->Register("cfg_splice", &cfg_splice, "");
+        po->Register("cfg_delta", &cfg_delta, "");
         po->Register("cfg_endpoint", &cfg_endpoint, "");
         po->Register("cfg_ivector", &cfg_ivector, "");
         po->Register("cfg_pitch", &cfg_pitch, "");
@@ -79,6 +81,7 @@ namespace alex_asr {
         LoadConfig(cfg_fbank, &fbank_opts);
         LoadConfig(cfg_cmvn, &cmvn_opts);
         LoadConfig(cfg_splice, &splice_opts);
+        LoadConfig(cfg_delta, &delta_opts);
         LoadConfig(cfg_endpoint, &endpoint_config);
         LoadConfig(cfg_ivector, &ivector_config);
         LoadConfig(cfg_pitch, &pitch_opts);

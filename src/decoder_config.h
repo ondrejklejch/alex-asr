@@ -38,6 +38,7 @@ namespace alex_asr {
         FbankOptions fbank_opts;
         OnlineCmvnOptions cmvn_opts;
         OnlineSpliceOptions splice_opts;
+        DeltaFeaturesOptions delta_opts;
         OnlineEndpointConfig endpoint_config;
         OnlineIvectorExtractionConfig ivector_config;
         PitchExtractionOptions pitch_opts;
@@ -53,6 +54,7 @@ namespace alex_asr {
 
         bool use_lda;
         bool use_splice;
+        bool use_delta;
         bool use_ivectors;
         bool use_cmvn;
         bool use_pitch;
@@ -63,6 +65,7 @@ namespace alex_asr {
         std::string cfg_fbank;
         std::string cfg_cmvn;
         std::string cfg_splice;
+        std::string cfg_delta;
         std::string cfg_endpoint;
         std::string cfg_ivector;
         std::string cfg_pitch;

@@ -20,6 +20,7 @@ namespace alex_asr {
         OnlineCmvn *cmvn_;
         OnlineCmvnState *cmvn_state_;
         OnlineSpliceFrames *splice_;
+        OnlineDeltaFeature *delta_;
         OnlineTransform *transform_lda_;
         OnlineIvectorFeature *ivector_;
         OnlineAppendFeature *ivector_append_;

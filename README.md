@@ -77,6 +77,7 @@ Example of `alex_asr.conf` that should reside in `model_dir`:
 --cfg_fbank=fbank.cfg
 --cfg_cmvn=cmvn.cfg
 --cfg_splice=splice.cfg
+--cfg_delta=delta.cfg
 --cfg_endpoint=endpoint.cfg
 --cfg_ivector=ivector.cfg
 --cfg_pitch=pitch.cfg
@@ -139,6 +140,14 @@ Example ``splice.cfg``:
 ```
 
 Details: https://github.com/kaldi-asr/kaldi/blob/master/src/feat/online-feature.h#L384
+
+## Delta configuration
+
+Example ``delta.cfg``:
+```
+--delta-order=2
+--delta-window=3
+```
 
 ## Endpoint configuration
 
