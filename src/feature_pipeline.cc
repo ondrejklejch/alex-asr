@@ -38,16 +38,16 @@ namespace alex_asr {
             KALDI_ERR << "You have to specify a valid feature_type.";
         }
 
-        if(config.use_cmvn) {
-            KALDI_VLOG(3) << "Feature CMVN";
-            cmvn_state_ = new OnlineCmvnState(*config.cmvn_mat);
-            prev_feature = cmvn_ = new OnlineCmvn(config.cmvn_opts, *cmvn_state_, prev_feature);
-        }
-
         if(config.use_pitch) {
             pitch_ = new OnlinePitchFeature(config.pitch_opts);
             pitch_feature_ = new OnlineProcessPitch(config.pitch_process_opts, pitch_);
             prev_feature = pitch_append_ = new OnlineAppendFeature(prev_feature, pitch_feature_);
+        }
+
+        if(config.use_cmvn) {
+            KALDI_VLOG(3) << "Feature CMVN";
+            cmvn_state_ = new OnlineCmvnState(*config.cmvn_mat);
+            prev_feature = cmvn_ = new OnlineCmvn(config.cmvn_opts, *cmvn_state_, prev_feature);
         }
 
         if(config.model_type != DecoderConfig::NNET3) {
