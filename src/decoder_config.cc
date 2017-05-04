@@ -11,6 +11,7 @@ namespace alex_asr {
             use_ivectors(false),
             use_cmvn(false),
             use_pitch(false),
+            rescore(false),
             cfg_decoder(""),
             cfg_decodable(""),
             cfg_mfcc(""),
@@ -48,6 +49,9 @@ namespace alex_asr {
         po->Register("use_cmvn", &use_cmvn, "Are we using cmvn transform?");
         po->Register("use_pitch", &use_pitch, "Are we using pitch feature?");
         po->Register("bits_per_sample", &bits_per_sample, "Bits per sample for input.");
+        po->Register("rescore", &rescore, "Rescore lattice with bigger LM?");
+        po->Register("lm_small", &lm_small_rxfilename, "G.fst of the LM used in HCLG.");
+        po->Register("lm_big", &lm_big_rxfilename, "G.fst of the LM to rescore with.");
 
         po->Register("cfg_decoder", &cfg_decoder, "");
         po->Register("cfg_decodable", &cfg_decodable, "");

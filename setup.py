@@ -58,7 +58,7 @@ setup(
     packages=find_packages(exclude=["alex_asr/decoder.cpp"]),
     include_package_data=True,
     cmdclass={'build_ext': build_ext_with_make},
-    version='1.0.4',
+    version='1.0.5',
     install_requires=install_requires,
     setup_requires=['cython>=0.19.1', 'nose>=1.0'],
     ext_modules=[

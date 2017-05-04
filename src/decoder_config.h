@@ -58,6 +58,7 @@ namespace alex_asr {
         bool use_ivectors;
         bool use_cmvn;
         bool use_pitch;
+        bool rescore;
 
         std::string cfg_decoder;
         std::string cfg_decodable;
@@ -72,6 +73,8 @@ namespace alex_asr {
 
         std::string model_rxfilename;
         std::string fst_rxfilename;
+        std::string lm_small_rxfilename;
+        std::string lm_big_rxfilename;
         std::string words_rxfilename;
         std::string word_boundary_rxfilename;
         std::string lda_mat_rspecifier;

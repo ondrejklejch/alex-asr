@@ -2,6 +2,9 @@
 #include "src/utils.h"
 
 #include "online2/onlinebin-util.h"
+#include "fst/fstlib.h"
+#include "fstext/table-matcher.h"
+#include "fstext/kaldi-fst-io.h"
 #include "lat/kaldi-lattice.h"
 #include "lat/sausages.h"
 
@@ -11,6 +14,8 @@ namespace alex_asr {
     Decoder::Decoder(const string model_path) :
             feature_pipeline_(NULL),
             hclg_(NULL),
+            lm_small_(NULL),
+            lm_big_(NULL),
             decoder_(NULL),
             trans_model_(NULL),
             am_nnet2_(NULL),
@@ -19,7 +24,6 @@ namespace alex_asr {
             words_(NULL),
             config_(NULL),
             decodable_(NULL)
-
     {
         // Change dir to model_path. Change back when leaving the scope.
         local_cwd cwd_to_model_path(model_path);
@@ -35,6 +39,8 @@ namespace alex_asr {
     Decoder::~Decoder() {
         delete feature_pipeline_;
         delete hclg_;
+        delete lm_small_;
+        delete lm_big_;
         delete decoder_;
         delete trans_model_;
         delete am_nnet2_;
@@ -108,6 +114,37 @@ namespace alex_asr {
         if(config_->word_boundary_rxfilename != "") {
             WordBoundaryInfoNewOpts word_boundary_info_opts;
             word_boundary_info_ = new WordBoundaryInfo(word_boundary_info_opts, config_->word_boundary_rxfilename);
+        }
+
+        if(config_->rescore == true) {
+            LoadLM(config_->lm_small_rxfilename, &lm_small_);
+            LoadLM(config_->lm_big_rxfilename, &lm_big_);
+        }
+    }
+
+    void Decoder::LoadLM(
+        const string path,
+        fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > **lm_fst
+    ) {
+        int num_states_cache = 50000;
+
+        if (FileExists(path)) {
+            fst::VectorFst<fst::StdArc> *std_lm_fst = fst::ReadFstKaldi(path);
+            fst::Project(std_lm_fst, fst::PROJECT_OUTPUT);
+            if (std_lm_fst->Properties(fst::kILabelSorted, true) == 0) {
+                fst::ILabelCompare<fst::StdArc> ilabel_comp;
+                fst::ArcSort(std_lm_fst, ilabel_comp);
+            }
+
+            fst::CacheOptions cache_opts(true, num_states_cache);
+            fst::MapFstOptions mapfst_opts(cache_opts);
+            fst::StdToLatticeMapper<BaseFloat> mapper;
+            *lm_fst = new fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> >(*std_lm_fst, mapper, mapfst_opts);
+            delete std_lm_fst;
+
+            KALDI_VLOG(2) << "LM loaded: " << path;
+        } else {
+            KALDI_ERR << "LM" << path << "doesn't exist.";
         }
     }
 
@@ -213,9 +250,7 @@ namespace alex_asr {
         return ok;
     }
 
-    bool Decoder::GetLattice(fst::VectorFst<fst::LogArc> *fst_out,
-                                     double *tot_lik, bool end_of_utterance) {
-        CompactLattice lat;
+    bool Decoder::GetPrunedLattice(CompactLattice *lat) {
         Lattice raw_lat;
 
         if (decoder_->NumFramesDecoded() == 0)
@@ -224,27 +259,76 @@ namespace alex_asr {
         if (!config_->decoder_opts.determinize_lattice)
             KALDI_ERR << "--determinize-lattice=false option is not supported at the moment";
 
-        bool ok = decoder_->GetRawLattice(&raw_lat, end_of_utterance);
+        bool ok = decoder_->GetRawLattice(&raw_lat);
+
 
         BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
-        DeterminizeLatticePhonePrunedWrapper(
-                *trans_model_, &raw_lat, lat_beam, &lat, config_->decoder_opts.det_opts);
+        if(!config_->rescore) {
+            DeterminizeLatticePhonePrunedWrapper(*trans_model_, &raw_lat, lat_beam, lat, config_->decoder_opts.det_opts);
+        } else {
+            CompactLattice pruned_lat;
 
+            DeterminizeLatticePhonePrunedWrapper(*trans_model_, &raw_lat, lat_beam, &pruned_lat, config_->decoder_opts.det_opts);
+            ok = ok && RescoreLattice(pruned_lat, lat);
+        }
+
+        return ok;
+    }
+
+    bool Decoder::RescoreLattice(CompactLattice lat, CompactLattice *rescored_lattice) {
+        CompactLattice intermidiate_lattice;
+        bool ok = true;
+
+        ok = ok && RescoreLatticeWithLM(lat, -1.0, lm_small_, &intermidiate_lattice);
+        ok = ok && RescoreLatticeWithLM(intermidiate_lattice, 1.0, lm_big_, rescored_lattice);
+
+        return ok;
+    }
+
+    bool Decoder::RescoreLatticeWithLM(
+        CompactLattice lat,
+        float lm_scale,
+        fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_fst,
+        CompactLattice *rescored_lattice) {
+
+        // Taken from https://github.com/kaldi-asr/kaldi/blob/9b9b561e2b3d2bdf64c84f8626175953f0885264/src/latbin/lattice-lmrescore.cc
+
+        Lattice lattice;
+        ConvertLattice(lat, &lattice);
+
+        fst::ScaleLattice(fst::GraphLatticeScale(1.0 / lm_scale), &lattice);
+        ArcSort(&lattice, fst::OLabelCompare<LatticeArc>());
+
+        Lattice composed_lat;
+        fst::TableComposeOptions compose_opts(fst::TableMatcherOptions(), true, fst::SEQUENCE_FILTER, fst::MATCH_INPUT);
+        fst::TableComposeCache<fst::Fst<LatticeArc> > lm_compose_cache(compose_opts);
+        TableCompose(lattice, *lm_fst, &composed_lat, &lm_compose_cache);
+        Invert(&composed_lat);
+
+        DeterminizeLattice(composed_lat, rescored_lattice);
+        fst::ScaleLattice(fst::GraphLatticeScale(lm_scale), rescored_lattice);
+
+        return rescored_lattice->Start() != fst::kNoStateId;
+    }
+
+    bool Decoder::GetLattice(fst::VectorFst<fst::LogArc> *fst_out,
+                                     double *tot_lik, bool end_of_utterance) {
+        CompactLattice lat;
+        bool ok = true;
+
+        ok = this->GetPrunedLattice(&lat);
         *tot_lik = CompactLatticeToWordsPost(lat, fst_out);
 
         return ok;
     }
 
     bool Decoder::GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths) {
-        Lattice lat;
         CompactLattice compact_lat;
         CompactLattice best_path;
         CompactLattice aligned_best_path;
         bool ok = true;
 
-        ok = ok && decoder_->GetRawLattice(&lat);
-        BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
-        DeterminizeLatticePhonePrunedWrapper(*trans_model_, &lat, lat_beam, &compact_lat, config_->decoder_opts.det_opts);
+        ok = this->GetPrunedLattice(&compact_lat);
         CompactLatticeShortestPath(compact_lat, &best_path);
 
         if(config_->word_boundary_rxfilename == "") {
@@ -264,9 +348,7 @@ namespace alex_asr {
         CompactLattice aligned_best_path;
         bool ok = true;
 
-        ok = ok && decoder_->GetRawLattice(&lat);
-        BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
-        DeterminizeLatticePhonePrunedWrapper(*trans_model_, &lat, lat_beam, &compact_lat, config_->decoder_opts.det_opts);
+        ok = this->GetPrunedLattice(&compact_lat);
         CompactLatticeShortestPath(compact_lat, &best_path);
 
         if(config_->word_boundary_rxfilename != "") {

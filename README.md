@@ -70,6 +70,10 @@ Example of `alex_asr.conf` that should reside in `model_dir`:
                        # with configuration of the pitch extractor.
 --bits_per_sample=16   # 8/16; How many bits per sample frame?
 
+--rescore=True         # Rescore lattice with a bigger LM?
+--lm_small=G_small.fst # Original G.fst
+--lm_big=G_big.fst     # G.fst corresponding to the bigger LM
+
 # These parameters specify filenames of configuration of the particular parts of the decoder. Detailed below.
 --cfg_decoder=decoder.cfg
 --cfg_decodable=decodable.cfg

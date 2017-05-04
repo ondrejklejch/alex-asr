@@ -47,7 +47,8 @@ ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
           $(KALDI_DIR)/src/tree/kaldi-tree.a \
           $(KALDI_DIR)/src/matrix/kaldi-matrix.a \
           $(KALDI_DIR)/src/util/kaldi-util.a \
-          $(KALDI_DIR)/src/base/kaldi-base.a
+          $(KALDI_DIR)/src/base/kaldi-base.a \
+          $(KALDI_DIR)/src/fstext/kaldi-fstext.a
 
 LDFLAGS = $(ADDLIBS) -llapack_atlas -lcblas -latlas -lf77blas -lm -lpthread -ldl
 

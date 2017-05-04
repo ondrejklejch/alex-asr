@@ -32,7 +32,7 @@ namespace alex_asr {
         void FrameIn(unsigned char *buffer, int32 buffer_length);
         void FrameIn(VectorBase<BaseFloat> *waveform_in);
         bool GetBestPath(std::vector<int> *v_out, BaseFloat *prob);
-        bool GetLattice(fst::VectorFst<fst::LogArc> * out_fst, double *tot_lik, bool end_of_utt=true);
+        bool GetLattice(fst::VectorFst<fst::LogArc> *out_fst, double *tot_lik, bool end_of_utt=true);
         bool GetTimeAlignment(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths);
         bool GetTimeAlignmentWithWordConfidence(std::vector<int> *words, std::vector<int> *times, std::vector<int> *lengths, std::vector<float> *confs);
         string GetWord(int word_id);
@@ -51,6 +51,8 @@ namespace alex_asr {
         FeaturePipeline *feature_pipeline_;
 
         fst::StdFst *hclg_;
+        fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_small_;
+        fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_big_;
         LatticeFasterOnlineDecoder *decoder_;
         TransitionModel *trans_model_;
         nnet2::AmNnet *am_nnet2_;
@@ -63,8 +65,19 @@ namespace alex_asr {
 
         void InitTransformMatrices();
         void LoadDecoder();
+        void LoadLM(
+            const string path,
+            fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > **lm_fst
+        );
         void ParseConfig();
         void Deallocate();
+        bool GetPrunedLattice(CompactLattice *lat);
+        bool RescoreLattice(CompactLattice lat, CompactLattice *rescored_lattice);
+        bool RescoreLatticeWithLM(
+            CompactLattice lat,
+            float lm_scale,
+            fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_fst,
+            CompactLattice *rescored_lattice);
         bool FileExists(const std::string& name);
     };
 
