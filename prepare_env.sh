@@ -21,23 +21,29 @@ if [ ! -d libs ]; then
     git clone https://github.com/UFAL-DSG/pyfst.git libs/pyfst
 
     # Prepare Kaldi dependencies.
-    make -j 4 -C libs/kaldi/tools atlas
+    (
+        # Compile BLAS with multi threaded support
+        cd libs/kaldi/tools
+        sed -i "s/USE_THREAD=0/USE_THREAD=1/g" Makefile
+        make -j 8 openblas
+    )
     (
         # Patch OpenFST makefile so that we can link with it statically.
         cd libs/kaldi/tools;
         sed -i "s/--enable-ngram-fsts/--enable-ngram-fsts --with-pic/g" Makefile
-        make -j 4 openfst
+        make -j 8 openfst
     )
 
     # Configure Kaldi.
     (
         cd libs/kaldi/src;
         git checkout ${KALDI_REV}
-        ./configure --shared --use-cuda=no
+        ./configure --shared --use-cuda=no --openblas-root=../tools/OpenBLAS/install
     )
 
     # Build Kaldi.
-    make -j 4 -C libs/kaldi/src
+    make -j 8 -C libs/kaldi/src
+    make -j 8 -C libs/kaldi/src test
 else
     echo "It appears that the env is prepared. If there are errors, try deleting libs/ and rerunning the script."
 fi

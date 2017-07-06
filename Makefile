@@ -27,8 +27,7 @@ CXXFLAGS = -msse -msse2 -Wall \
       -g \
       -I$(FSTROOT)/include \
       -I$(KALDI_DIR)/src \
-      -I$(KALDI_DIR)/tools/ATLAS/include \
-      -I$(KALDI_DIR)/tools/CLAPACK \
+      -I$(KALDI_DIR)/tools/OpenBLAS/install/include \
       -Wno-sign-compare -I. -fPIC
 
 ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
@@ -48,9 +47,10 @@ ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
           $(KALDI_DIR)/src/matrix/kaldi-matrix.a \
           $(KALDI_DIR)/src/util/kaldi-util.a \
           $(KALDI_DIR)/src/base/kaldi-base.a \
-          $(KALDI_DIR)/src/fstext/kaldi-fstext.a
+          $(KALDI_DIR)/src/fstext/kaldi-fstext.a \
+          $(KALDI_DIR)/tools/OpenBLAS/install/lib/libopenblas.a
 
-LDFLAGS = $(ADDLIBS) -llapack_atlas -lcblas -latlas -lf77blas -lm -lpthread -ldl
+LDFLAGS = $(ADDLIBS) -lgfortran -lm -lpthread -ldl
 
 all: $(LIBFILE) $(BINFILES) py_flags
 
