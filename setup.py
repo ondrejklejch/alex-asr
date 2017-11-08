@@ -22,7 +22,7 @@ if python_version < (2, 7):
 
 kaldi_dir = environ.get('KALDI_DIR', 'libs/kaldi')
 library_dirs = ['/usr/lib']
-libraries = ['lapack_atlas', 'cblas', 'atlas', 'f77blas', 'm', 'pthread', 'dl']
+libraries = ['/usr/lib64/atlas/libsatlas.so', 'm', 'pthread', 'dl']
 
 
 def kaldi_path(path):

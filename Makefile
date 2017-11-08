@@ -48,9 +48,10 @@ ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
           $(KALDI_DIR)/src/matrix/kaldi-matrix.a \
           $(KALDI_DIR)/src/util/kaldi-util.a \
           $(KALDI_DIR)/src/base/kaldi-base.a \
-          $(KALDI_DIR)/src/fstext/kaldi-fstext.a
+          $(KALDI_DIR)/src/fstext/kaldi-fstext.a \
+	  /usr/lib64/atlas/libsatlas.so
 
-LDFLAGS = $(ADDLIBS) -llapack_atlas -lcblas -latlas -lf77blas -lm -lpthread -ldl
+LDFLAGS = $(ADDLIBS) -lm -lpthread -ldl
 
 all: $(LIBFILE) $(BINFILES) py_flags
 
