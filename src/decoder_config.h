@@ -70,6 +70,7 @@ namespace alex_asr {
         std::string cfg_endpoint;
         std::string cfg_ivector;
         std::string cfg_pitch;
+        std::string cfg_pitch_process;
 
         std::string model_rxfilename;
         std::string fst_rxfilename;

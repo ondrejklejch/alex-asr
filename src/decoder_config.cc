@@ -21,7 +21,8 @@ namespace alex_asr {
             cfg_delta(""),
             cfg_endpoint(""),
             cfg_ivector(""),
-            cfg_pitch("")
+            cfg_pitch(""),
+            cfg_pitch_process("")
     {
         decodable_opts.acoustic_scale = 0.1;
         nnet3_decodable_opts.acoustic_scale = 0.1;
@@ -89,7 +90,7 @@ namespace alex_asr {
         LoadConfig(cfg_endpoint, &endpoint_config);
         LoadConfig(cfg_ivector, &ivector_config);
         LoadConfig(cfg_pitch, &pitch_opts);
-        LoadConfig(cfg_pitch, &pitch_process_opts);
+        LoadConfig(cfg_pitch_process, &pitch_process_opts);
 
         InitAux();
     }
