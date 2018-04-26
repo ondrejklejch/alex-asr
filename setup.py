@@ -74,7 +74,7 @@ setup(
             sources=['alex_asr/decoder.pyx', ],
         ),
         Extension(name='alex_asr.fst._fst',
-            extra_compile_args=['-std=c++0x'],  # NOTE: This is for backward compatibility with gcc 4.6 which is in ubuntu 12.04. Ideally we should use '-std=c++11'.
+            extra_compile_args=['-std=c++11'],  # NOTE: This is for backward compatibility with gcc 4.6 which is in ubuntu 12.04. Ideally we should use '-std=c++11'.
             include_dirs=[
                 '.',
                 kaldi_path('tools/openfst/include'),

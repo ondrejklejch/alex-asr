@@ -11,10 +11,11 @@ namespace alex_asr {
         FeaturePipeline(DecoderConfig & config);
         ~FeaturePipeline();
         OnlineFeatureInterface *GetFeature();
+        OnlineFeatureInterface *GetInputFeature();
+        OnlineIvectorFeature* GetIvectorFeature();
         void AcceptWaveform(BaseFloat sampling_rate,
                             const VectorBase<BaseFloat> &waveform);
         void InputFinished();
-        OnlineIvectorFeature* GetIvectorFeature();
     private:
         OnlineBaseFeature *base_feature_;
         OnlineCmvn *cmvn_;
@@ -27,7 +28,7 @@ namespace alex_asr {
         OnlinePitchFeature *pitch_;
         OnlineProcessPitch *pitch_feature_;
         OnlineAppendFeature *pitch_append_;
-
+        OnlineFeatureInterface *input_feature_;
         OnlineFeatureInterface *final_feature_;
     };
 }
