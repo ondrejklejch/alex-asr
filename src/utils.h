@@ -59,8 +59,8 @@ namespace alex_asr {
 
     template<typename LatticeType>
     static double ComputeLatticeAlphasAndBetas(const LatticeType &lat,
-                                               vector<double> *alpha,
-                                               vector<double> *beta);
+                                               std::vector<double> *alpha,
+                                               std::vector<double> *beta);
 
     const string GetDirectory(const string& file_name);
 

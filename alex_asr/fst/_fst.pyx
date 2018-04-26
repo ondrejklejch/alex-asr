@@ -823,7 +823,7 @@ cdef class StdVectorFst(_Fst):
         cdef libfst.FstDrawer[libfst.StdArc]* drawer
         drawer = new libfst.FstDrawer[libfst.StdArc](self.fst[0],
                 isyms_table, osyms_table, ssyms_table,
-                False, string(), 8.5, 11, True, False, 0.40, 0.25, 14, 5, False)
+                False, string(), 8.5, 11, True, False, 0.40, 0.25, 14, 5, '', False)
         drawer.Draw(&out, 'fst')
         cdef bytes out_str = out.str()
         del drawer
@@ -1464,7 +1464,7 @@ cdef class LogVectorFst(_Fst):
         cdef libfst.FstDrawer[libfst.LogArc]* drawer
         drawer = new libfst.FstDrawer[libfst.LogArc](self.fst[0],
                 isyms_table, osyms_table, ssyms_table,
-                False, string(), 8.5, 11, True, False, 0.40, 0.25, 14, 5, False)
+                False, string(), 8.5, 11, True, False, 0.40, 0.25, 14, 5, '', False)
         drawer.Draw(&out, 'fst')
         cdef bytes out_str = out.str()
         del drawer

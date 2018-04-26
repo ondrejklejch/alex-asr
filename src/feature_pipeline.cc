@@ -17,6 +17,7 @@ namespace alex_asr {
         pitch_(NULL),
         pitch_feature_(NULL),
         pitch_append_(NULL),
+        input_feature_(NULL),
         final_feature_(NULL)
 
     {
@@ -70,6 +71,8 @@ namespace alex_asr {
             KALDI_VLOG(3) << "    -> dims: " << transform_lda_->Dim();
         }
 
+        input_feature_ = prev_feature;
+
         if (config.use_ivectors) {
             KALDI_VLOG(3) << "Feature IVectors";
             ivector_ = new OnlineIvectorFeature(*config.ivector_extraction_info, base_feature_);
@@ -96,6 +99,10 @@ namespace alex_asr {
 
     OnlineFeatureInterface *FeaturePipeline::GetFeature() {
         return final_feature_;
+    }
+
+    OnlineFeatureInterface *FeaturePipeline::GetInputFeature() {
+        return input_feature_;
     }
 
     void FeaturePipeline::AcceptWaveform(BaseFloat sampling_rate,

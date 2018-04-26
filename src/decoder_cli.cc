@@ -44,7 +44,7 @@ int main(int argc, const char* const* argv) {
         decoder->FrameIn(&waveform);
         decoder->InputFinished();
 
-        vector<int> words;
+        std::vector<int> words;
         float32 prob;
         do {
             decoded_frames += decoded_now;

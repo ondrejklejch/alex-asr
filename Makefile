@@ -18,7 +18,7 @@ OBJFILES = src/decoder.o src/utils.o src/feature_pipeline.o \
            src/decoder_config.o src/decoder_cli.o
 BINFILES = src/decoder_cli
 
-CXXFLAGS = -msse -msse2 -Wall \
+CXXFLAGS = -std=gnu++11 -msse -msse2 -Wall \
 	   -pthread \
       -DKALDI_DOUBLEPRECISION=0 -DHAVE_POSIX_MEMALIGN \
       -Wno-sign-compare -Wno-unused-local-typedefs -Winit-self \
@@ -41,7 +41,6 @@ ADDLIBS = $(FSTROOT)/src/lib/.libs/libfst.a \
           $(KALDI_DIR)/src/feat/kaldi-feat.a \
           $(KALDI_DIR)/src/transform/kaldi-transform.a \
           $(KALDI_DIR)/src/gmm/kaldi-gmm.a \
-          $(KALDI_DIR)/src/thread/kaldi-thread.a \
           $(KALDI_DIR)/src/hmm/kaldi-hmm.a \
           $(KALDI_DIR)/src/tree/kaldi-tree.a \
           $(KALDI_DIR)/src/matrix/kaldi-matrix.a \

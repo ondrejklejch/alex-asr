@@ -57,6 +57,7 @@ namespace alex_asr {
         TransitionModel *trans_model_;
         nnet2::AmNnet *am_nnet2_;
         nnet3::AmNnetSimple *am_nnet3_;
+        nnet3::DecodableNnetSimpleLoopedInfo *nnet3_info_;
         AmDiagGmm *am_gmm_;
         fst::SymbolTable *words_;
         WordBoundaryInfo *word_boundary_info_;

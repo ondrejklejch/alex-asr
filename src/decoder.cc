@@ -20,6 +20,7 @@ namespace alex_asr {
             trans_model_(NULL),
             am_nnet2_(NULL),
             am_nnet3_(NULL),
+            nnet3_info_(NULL),
             am_gmm_(NULL),
             words_(NULL),
             config_(NULL),
@@ -45,6 +46,7 @@ namespace alex_asr {
         delete trans_model_;
         delete am_nnet2_;
         delete am_nnet3_;
+        delete nnet3_info_;
         delete am_gmm_;
         delete words_;
         delete config_;
@@ -100,6 +102,7 @@ namespace alex_asr {
             KALDI_PARANOID_ASSERT(am_nnet3_ == NULL);
             am_nnet3_ = new nnet3::AmNnetSimple();
             am_nnet3_->Read(ki.Stream(), binary);
+            nnet3_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(config_->nnet3_decodable_opts, am_nnet3_);
         }
 
         KALDI_PARANOID_ASSERT(hclg_ == NULL);
@@ -165,10 +168,10 @@ namespace alex_asr {
                                                          config_->decodable_opts,
                                                          feature_pipeline_->GetFeature());
         } else if(config_->model_type == DecoderConfig::NNET3) {
-            decodable_ = new kaldi::nnet3::DecodableNnet3SimpleOnline(*am_nnet3_,
-                                                                      *trans_model_,
-                                                                      config_->nnet3_decodable_opts,
-                                                                      feature_pipeline_->GetFeature());
+            decodable_ = new nnet3::DecodableAmNnetLoopedOnline(*trans_model_,
+                                                                *nnet3_info_,
+                                                                feature_pipeline_->GetInputFeature(),
+                                                                feature_pipeline_->GetIvectorFeature());
         } else {
             KALDI_ASSERT(false);  // This means the program is in invalid state.
         }
@@ -241,7 +244,7 @@ namespace alex_asr {
         LatticeWeight weight;
         std::vector<int32> ids;
         fst::GetLinearSymbolSequence(lat,
-                                     static_cast<vector<int32> *>(0),
+                                     static_cast<std::vector<int32> *>(0),
                                      out_words,
                                      &weight);
 
@@ -358,7 +361,7 @@ namespace alex_asr {
         }
 
         ok = ok && CompactLatticeToWordAlignment(aligned_best_path, words, times, lengths);
-        MinimumBayesRisk *mbr = new MinimumBayesRisk(compact_lat, *words, true);
+        MinimumBayesRisk *mbr = new MinimumBayesRisk(compact_lat, *words, MinimumBayesRiskOptions());
         *confs = mbr->GetOneBestConfidences();
 
         return ok;
