@@ -239,7 +239,10 @@ namespace alex_asr {
         *prob = -1.0f;
 
         Lattice lat;
+
         bool ok = decoder_->GetBestPath(&lat);
+
+        // TODO: BEST PATH can't work  with reweighting of AM because it returns a single path before the rew.
 
         LatticeWeight weight;
         std::vector<int32> ids;
@@ -262,8 +265,13 @@ namespace alex_asr {
         if (!config_->decoder_opts.determinize_lattice)
             KALDI_ERR << "--determinize-lattice=false option is not supported at the moment";
 
-        bool ok = decoder_->GetRawLattice(&raw_lat);
 
+        bool ok = decoder_->GetRawLattice(&raw_lat);
+        if (config_->model_type == DecoderConfig::NNET3) {
+            if (config_->post_decode_acwt != 1.0) {
+                PostDecodeAMRescore(&raw_lat, config_->post_decode_acwt);
+            }
+        }
 
         BaseFloat lat_beam = config_->decoder_opts.lattice_beam;
         if(!config_->rescore) {
@@ -312,6 +320,18 @@ namespace alex_asr {
         fst::ScaleLattice(fst::GraphLatticeScale(lm_scale), rescored_lattice);
 
         return rescored_lattice->Start() != fst::kNoStateId;
+    }
+
+    void Decoder::PostDecodeAMRescore(Lattice *lat, double acoustic_scale) {
+        std::vector<std::vector<double> > scale(2);
+        scale[0].resize(2);
+        scale[1].resize(2);
+        scale[0][0] = 1.0; // lm scale
+        scale[0][1] = 0.0; // acoustic cost to lm cost scaling
+        scale[1][0] = 0.0; // lm cost to acoustic cost scaling
+        scale[1][1] = acoustic_scale;
+
+        fst::ScaleLattice(scale, lat);
     }
 
     bool Decoder::GetLattice(fst::VectorFst<fst::LogArc> *fst_out,

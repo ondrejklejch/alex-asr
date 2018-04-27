@@ -59,6 +59,7 @@ namespace alex_asr {
         bool use_cmvn;
         bool use_pitch;
         bool rescore;
+        double post_decode_acwt;
 
         std::string cfg_decoder;
         std::string cfg_decodable;
