@@ -79,6 +79,7 @@ namespace alex_asr {
             float lm_scale,
             fst::MapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_fst,
             CompactLattice *rescored_lattice);
+        void PostDecodeAMRescore(Lattice *lat, double acoustic_scale);
         bool FileExists(const std::string& name);
     };
 

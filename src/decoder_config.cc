@@ -12,6 +12,7 @@ namespace alex_asr {
             use_cmvn(false),
             use_pitch(false),
             rescore(false),
+            post_decode_acwt(1.0),
             cfg_decoder(""),
             cfg_decodable(""),
             cfg_mfcc(""),
@@ -50,6 +51,7 @@ namespace alex_asr {
         po->Register("use_cmvn", &use_cmvn, "Are we using cmvn transform?");
         po->Register("use_pitch", &use_pitch, "Are we using pitch feature?");
         po->Register("bits_per_sample", &bits_per_sample, "Bits per sample for input.");
+        po->Register("post_decode_acwt", &post_decode_acwt, "Rescoring weight of the AM after decode; needed for chain models.");
         po->Register("rescore", &rescore, "Rescore lattice with bigger LM?");
         po->Register("lm_small", &lm_small_rxfilename, "G.fst of the LM used in HCLG.");
         po->Register("lm_big", &lm_big_rxfilename, "G.fst of the LM to rescore with.");
