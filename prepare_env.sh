@@ -6,6 +6,11 @@ FSTDIR=$(python -c "import os,sys; print os.path.realpath(sys.argv[1])" libs/kal
 OPENFST_VERSION=1.3.4
 KALDI_REV=f51c984a24c769037e81671308b74efa33db264a
 
+if [ -z $1 ]; then
+    USE_THREAD=0
+else
+    USE_THREAD=$1
+fi
 
 if [ ! -d libs ]; then
     mkdir -p libs
@@ -24,7 +29,7 @@ if [ ! -d libs ]; then
     (
         # Compile BLAS with multi threaded support
         cd libs/kaldi/tools
-        sed -i "s/USE_THREAD=0/USE_THREAD=1/g" Makefile
+        sed -i "s/USE_THREAD=0/USE_THREAD=$USE_THREAD/g" Makefile
         make -j 8 openblas
     )
     (
