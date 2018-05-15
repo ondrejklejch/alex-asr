@@ -36,6 +36,7 @@ cdef extern from "src/decoder.h" namespace "alex_asr":
         int GetBitsPerSample() except +
         void SetBitsPerSample(int n_bits) except +
         float GetFrameShift() except +
+        float GetSamplingFrequency() except +
 
 
 # NOTE: Function signatures as the first line of the docstring are needed in order for
@@ -267,3 +268,10 @@ cdef class Decoder:
         """
 
         self.thisptr.SetBitsPerSample(n_bits)
+
+    def get_sample_rate(self):
+        """
+        Returns sample rate used by the decoder
+        """
+        return self.thisptr.GetSamplingFrequency()
+

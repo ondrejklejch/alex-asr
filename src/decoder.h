@@ -47,6 +47,7 @@ namespace alex_asr {
         void SetBitsPerSample(int n_bits);
         int GetBitsPerSample();
         float GetFrameShift();
+        float GetSamplingFrequency();
     private:
         FeaturePipeline *feature_pipeline_;
 

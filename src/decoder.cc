@@ -441,4 +441,8 @@ namespace alex_asr {
     float Decoder::GetFrameShift() {
         return config_->FrameShiftInSeconds();
     }
+
+    float Decoder::GetSamplingFrequency() {
+        return (float) config_ -> SamplingFrequency();
+    }
 }
