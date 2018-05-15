@@ -7,6 +7,7 @@
 #include "fstext/kaldi-fst-io.h"
 #include "lat/kaldi-lattice.h"
 #include "lat/sausages.h"
+#include "nnet3/nnet-utils.h"
 
 using namespace kaldi;
 
@@ -102,6 +103,9 @@ namespace alex_asr {
             KALDI_PARANOID_ASSERT(am_nnet3_ == NULL);
             am_nnet3_ = new nnet3::AmNnetSimple();
             am_nnet3_->Read(ki.Stream(), binary);
+            SetBatchnormTestMode(true, &am_nnet3_->GetNnet());
+            SetDropoutTestMode(true, &am_nnet3_->GetNnet());
+            CollapseModel(nnet3::CollapseModelConfig(), &am_nnet3_->GetNnet());
             nnet3_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(config_->nnet3_decodable_opts, am_nnet3_);
         }
 
