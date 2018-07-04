@@ -94,7 +94,6 @@ namespace alex_asr {
         LoadConfig(cfg_pitch, &pitch_opts);
         LoadConfig(cfg_pitch_process, &pitch_process_opts);
 
-        InitAux();
     }
 
     void DecoderConfig::InitAux() {
@@ -214,6 +213,10 @@ namespace alex_asr {
         res &= OptionCheck(use_lda && lda_mat_rspecifier == "",
                            "You have to specify --mat_lda or set --use_lda=false.");
 
+	res &= OptionCheck(rescore && (lm_small_rxfilename == "" || lm_big_rxfilename == ""),
+	                   "You have to specify --lm_small and --lm_big if you want to rescore with a bigger LM.");
+
+	InitAux();
         return res;
     }
 
