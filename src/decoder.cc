@@ -105,7 +105,9 @@ namespace alex_asr {
             am_nnet3_->Read(ki.Stream(), binary);
             SetBatchnormTestMode(true, &am_nnet3_->GetNnet());
             SetDropoutTestMode(true, &am_nnet3_->GetNnet());
-            CollapseModel(nnet3::CollapseModelConfig(), &am_nnet3_->GetNnet());
+            // NNET3 models are not collapsed because of a bug in collapsing logic.
+            // See: https://github.com/kaldi-asr/kaldi/issues/3661#issuecomment-543307470
+            // CollapseModel(nnet3::CollapseModelConfig(), &am_nnet3_->GetNnet());
             nnet3_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(config_->nnet3_decodable_opts, am_nnet3_);
         }
 
